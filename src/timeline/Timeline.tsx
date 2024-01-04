@@ -3,18 +3,18 @@ import map from 'lodash/map';
 import times from 'lodash/times';
 import groupBy from 'lodash/groupBy';
 
-import React, {useCallback, useEffect, useMemo, useRef} from 'react';
-import {View, ScrollView} from 'react-native';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import { View, ScrollView } from 'react-native';
 
 import constants from '../commons/constants';
-import {generateDay} from '../dateutils';
-import {getCalendarDateString} from '../services';
-import {Theme} from '../types';
+import { generateDay } from '../dateutils';
+import { getCalendarDateString } from '../services';
+import { Theme } from '../types';
 import styleConstructor from './style';
-import {populateEvents, HOUR_BLOCK_HEIGHT, UnavailableHours} from './Packer';
-import {calcTimeOffset} from './helpers/presenter';
-import TimelineHours, {TimelineHoursProps} from './TimelineHours';
-import EventBlock, {Event, PackedEvent} from './EventBlock';
+import { populateEvents, HOUR_BLOCK_HEIGHT, UnavailableHours } from './Packer';
+import { calcTimeOffset } from './helpers/presenter';
+import TimelineHours, { TimelineHoursProps } from './TimelineHours';
+import EventBlock, { Event, PackedEvent } from './EventBlock';
 import NowIndicator from './NowIndicator';
 import useTimelineOffset from './useTimelineOffset';
 
@@ -68,7 +68,7 @@ export interface TimelineProps {
   /**
    * Initial time to scroll to
    */
-  initialTime?: {hour: number; minutes: number};
+  initialTime?: { hour: number; minutes: number };
   /**
    * Whether to use 24 hours format for the timeline hours
    */
@@ -158,7 +158,7 @@ const Timeline = (props: TimelineProps) => {
   const calendarHeight = useRef((end - start) * HOUR_BLOCK_HEIGHT);
   const styles = useRef(styleConstructor(theme || props.styles, calendarHeight.current));
 
-  const {scrollEvents} = useTimelineOffset({onChangeOffset, scrollOffset, scrollViewRef: scrollView});
+  const { scrollEvents } = useTimelineOffset({ onChangeOffset, scrollOffset, scrollViewRef: scrollView });
 
   const width = useMemo(() => {
     return constants.screenWidth - timelineLeftInset;
@@ -196,8 +196,8 @@ const Timeline = (props: TimelineProps) => {
   }, []);
 
   const _onEventPress = useCallback(
-    (dateIndex: number, eventIndex: number) => {
-      const event = packedEvents[dateIndex][eventIndex];
+    (dateIndex: number, eventIndex: number, packedEventsAux: any) => {
+      const event = packedEventsAux[dateIndex][eventIndex];
       if (eventTapped) {
         //TODO: remove after deprecation
         eventTapped(event);
@@ -210,7 +210,7 @@ const Timeline = (props: TimelineProps) => {
 
   const renderEvents = (dayIndex: number) => {
     const events = packedEvents[dayIndex].map((event: PackedEvent, eventIndex: number) => {
-      const onEventPress = () => _onEventPress(dayIndex, eventIndex);
+      const onEventPress = () => _onEventPress(dayIndex, eventIndex, packedEvents);
       return (
         <EventBlock
           key={eventIndex}
@@ -225,7 +225,7 @@ const Timeline = (props: TimelineProps) => {
     });
 
     return (
-      <View pointerEvents={'box-none'}  style={[{marginLeft: dayIndex === 0 ? timelineLeftInset : undefined}, styles.current.eventsContainer]}>
+      <View pointerEvents={'box-none'} style={[{ marginLeft: dayIndex === 0 ? timelineLeftInset : undefined }, styles.current.eventsContainer]}>
         {events}
       </View>
     );
@@ -247,7 +247,7 @@ const Timeline = (props: TimelineProps) => {
       // @ts-expect-error
       ref={scrollView}
       style={styles.current.container}
-      contentContainerStyle={[styles.current.contentStyle, {width: constants.screenWidth}]}
+      contentContainerStyle={[styles.current.contentStyle, { width: constants.screenWidth }]}
       showsVerticalScrollIndicator={false}
       {...scrollEvents}
       testID={testID}
@@ -271,5 +271,5 @@ const Timeline = (props: TimelineProps) => {
   );
 };
 
-export {Event as TimelineEventProps, PackedEvent as TimelinePackedEventProps};
+export { Event as TimelineEventProps, PackedEvent as TimelinePackedEventProps };
 export default React.memo(Timeline);
